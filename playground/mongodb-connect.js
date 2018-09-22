@@ -7,17 +7,18 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, client) => {
   }
   console.log('connected to MongoDB server');
 
-  const db = client.db('TodoApp');
+  const db = client.db('TodoApp'); // specifies the database
 
-  db.collection('Todos').insertOne({
-    rext: 'something to do',
-    completed: false
-  }, (err, result) => {
-    if (err) {
-      return console.log('unable to insert todo', err);
-    }
-    console.log(JSON.stringify(result.ops, undefined, 2));
-  });
+  db.collection('Todos') // specifies the collection
+    .insertOne({ // specifies one document
+      text: 'something to do',
+      completed: false
+    }, (err, result) => {
+      if (err) {
+        return console.log('unable to insert todo', err);
+      }
+      console.log(JSON.stringify(result.ops, undefined, 2));
+    });
 
   db.collection('Users').insertOne({
     // _id: 123,
