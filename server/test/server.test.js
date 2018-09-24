@@ -5,11 +5,21 @@ const {app} = require('./../server');
 const {Todo} = require('./../models/Todo');
 const {Users} = require('./../models/Users');
 
+const todos = [{
+  text: 'First test todo'
+}, {
+  text: 'second test todo'
+}];
+
 beforeEach((done) => {
-  Todo.remove({}).then(() => done());
+  Todo.deleteMany({}).then(() => {
+    Todo.insertMany(todos);
+  }).then(() => {
+    done();
+  });
 });
 
-describe('POST .todos', () => {
+describe('POST /todos', () => {
   it('Should create a new todo', (done) => {
     const text = 'test todo text';
 
@@ -25,7 +35,7 @@ describe('POST .todos', () => {
           return done(err);
         }
 
-        Todo.find().then((doc) => {
+        Todo.find({text}).then((doc) => {
           expect(doc.length).toBe(1); // we expect the doc to have the length of 1
           expect(doc[0].text).toBe(text); // and we expect the first doc property to have the text value
           done();
@@ -45,12 +55,23 @@ describe('POST .todos', () => {
         }
 
         Todo.find().then((doc) => {
-          expect(doc.length).toBe(0); // 0 , because there is no doc in DB, all docs have wiped by beforeEach()
+          expect(doc.length).toBe(2); // 0 , because there is no doc in DB, all docs have wiped by beforeEach()
           done();
         }).catch((e) => {
           done(e);
         });
       });
+  });
+  describe('GET /todos', () => {
+    it('should get all todos', (done) => {
+      request(app)
+        .get('/todos')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.todos.length).toBe(2);
+        })
+        .end(done);
+    });
   });
 });
 
