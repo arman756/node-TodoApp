@@ -3,6 +3,7 @@ require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+const {authenticate} = require('./middleware/authenticate');
 const _ = require('lodash');
 
 const {mongoose} = require('./db/mongoose');
@@ -45,13 +46,17 @@ app.post('/users', (req, res) => {
   });
 });
 
-app.get('/users', (req, res) => {
-  Users.find().then((users) => {
-    res.send({users});
-  }, (e) => {
-    res.status(400).send(e);
-  });
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
+
+// app.get('/users', (req, res) => {
+//   Users.find().then((users) => {
+//     res.send({users})
+//   }, (e) => {
+//     res.status(400).send(e)
+//   })
+// })
 
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {

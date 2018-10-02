@@ -57,6 +57,48 @@ UserSchema.methods.generateAuthToken = function () {
   });
 };
 
-const Users = mongoose.model('users', UserSchema);
+// UserSchema.statics.findByToken = function (token) {
+//   const Users = this
+//   let decoded
+//   try {
+//     decoded = jwt.verify(token, 'abc123')
+//   } catch (e) {
+//     // return new Promise((resolve,reject)=>{
+//     //   reject()
+//     // })
+//     return Promise.reject()
+//   }
 
-module.exports = {Users};
+//   return Users.findOne({
+//     '_id': decoded._id,
+//     'tokens.token': token,
+//     'token.access': 'auth'
+//   })
+// }
+
+// const Users = mongoose.model('users', UserSchema)
+
+// module.exports = {Users}
+
+UserSchema.statics.findByToken = function (token) {
+  const Users = this;
+  let decoded;
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (e) {
+    // return new Promise((resolve,reject)=>{
+    //   reject()
+    // })
+    return Promise.reject();
+  }
+
+  return Users.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+};
+
+const Users = mongoose.model('User', UserSchema);
+
+module.exports = { Users};
