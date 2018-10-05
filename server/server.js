@@ -95,15 +95,59 @@ app.patch('/todos/:id', (req, res) => {
   });
 });
 
+// app.post('/users', (req, res) => {
+//   const body = _.pick(req.body, ['email', 'password'])
+//   const user = new Users(body)
+//   // {
+//   //   // email: req.body.email,
+//   //   // password: req.body.password
+//   // }
+//   user.save().then(() => {
+//     // res.send(user)
+//     return user.generateAuthToken()
+//   }).then((token) => {
+//     res.header('x-auth', token).send(user)
+//   }).catch((e) => {
+//     res.status(400).send(e)
+//   })
+// })
+
+// app.get('/users/me', authenticate, (req, res) => {
+//   res.send(req.user)
+// })
+
+// // POST /users/login {email,password}
+// app.post('/users/login', (req, res) => {
+//   const body = _.pick(req.body, ['email', 'password'])
+//   Users.findByCredential(body.email, body.password).then((user) => {
+//     return user.generateAuthToken().then((token) => {
+//       res.header('auth', token).send({user})
+//     })
+//   }).catch((e) => {
+//     res.status(400).send()
+//   })
+// })
+
+// app.delete('/users/me/token', authenticate, (req, res) => {
+//   req.user.removeToken(req.token).then(() => {
+//     res.status(200).send()
+//   }, () => {
+//     res.status(400).send()
+//   })
+// })
+// app.get('/users', (req, res) => {
+//   Users.find().then((users) => {
+//     res.send({users})
+//   }, (e) => {
+//     res.status(400).send(e)
+//   })
+// })
+
 app.post('/users', (req, res) => {
-  const body = _.pick(req.body, ['email', 'password']);
-  const user = new Users(body);
-  // {
-  //   // email: req.body.email,
-  //   // password: req.body.password
-  // }
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new Users(body);
+
   user.save().then(() => {
-    // res.send(user)
     return user.generateAuthToken();
   }).then((token) => {
     res.header('x-auth', token).send(user);
@@ -116,25 +160,25 @@ app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
 
-// POST /users/login {email,password}
 app.post('/users/login', (req, res) => {
-  const body = _.pick(req.body, ['email', 'password']);
-  Users.findByCredential(body.email, body.password).then((user) => {
+  var body = _.pick(req.body, ['email', 'password']);
+
+  Users.findByCredentials(body.email, body.password).then((user) => {
     return user.generateAuthToken().then((token) => {
-      res.header('auth', token).send({user});
+      res.header('x-auth', token).send(user);
     });
   }).catch((e) => {
     res.status(400).send();
   });
 });
 
-// app.get('/users', (req, res) => {
-//   Users.find().then((users) => {
-//     res.send({users})
-//   }, (e) => {
-//     res.status(400).send(e)
-//   })
-// })
+app.delete('/users/me/token', authenticate, (req, res) => {
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send();
+  }, () => {
+    res.status(400).send();
+  });
+});
 
 app.listen(port, () => {
   console.log(`Started on port port ${port}`);
